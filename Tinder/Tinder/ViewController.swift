@@ -13,8 +13,13 @@ class ViewController: UIViewController {
 
     @IBOutlet weak var resimBegeni: UIImageView!
     @IBOutlet weak var anaResim: UIView!
+    @IBOutlet weak var ortaResim: UIImageView!
+    
+    var userId = ""
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        kullaniciGetir()
     }
     
     @IBAction func likeButon(_ sender: Any) {
@@ -65,28 +70,92 @@ class ViewController: UIViewController {
         
         //Resmi Merkeze Döndürme Animasyonu
         if sender.state == UIGestureRecognizer.State.ended{
+            
+            var likeOrUnlike = ""
+            
+            
             if anaResim.center.x < 60{
                 UIView.animate(withDuration: 0.5) {
                     anaResim.center = CGPoint(x: anaResim.center.x - 200, y: anaResim.center.y + 50)
+                    //Beğenilmediği anlamına geliyor
+                    likeOrUnlike = "unliked"
                 }
+                yeniKisiGoster(likeOrUnlike : likeOrUnlike)
+                animate()
                 return
             }
             else if anaResim.center.x > (view.frame.width - 60){
                 UIView.animate(withDuration: 0.5) {
                     anaResim.center = CGPoint(x: anaResim.center.x + 200, y: anaResim.center.y + 50)
+                    //Beğenildiği anlamına geliyor
+                    likeOrUnlike = "liked"
                 }
+                yeniKisiGoster(likeOrUnlike : likeOrUnlike)
+                animate()
                 return
             }
             
-            UIView.animate(withDuration: 0.5) {
-                anaResim.center = self.view.center
-                self.resimBegeni.alpha = 0
-                anaResim.transform = CGAffineTransform.identity
-                
-            }
+            
+        }
+    }
+    func yeniKisiGoster(likeOrUnlike : String){
+        if likeOrUnlike != "" && userId != ""{
+            PFUser.current()?.addUniqueObject(userId, forKey: likeOrUnlike)
+            PFUser.current()?.saveInBackground(block: { (success, error) in
+                if success{
+                    self.kullaniciGetir()
+                }
+            })
         }
     }
     
-
+    func animate(){
+        UIView.animate(withDuration: 0.5) {
+            self.anaResim.center = self.view.center
+            self.resimBegeni.alpha = 0
+            self.anaResim.transform = CGAffineTransform.identity
+            
+        }
+    }
+    
+    //Veritabanından kullanıcı resimlerinin belli bir koşula göre çekilmesi
+    func kullaniciGetir(){
+        if let sorgu = PFUser.query(){
+            sorgu.whereKey("interest", equalTo: PFUser.current()!["gender"])
+            sorgu.whereKey("gender", equalTo: PFUser.current()!["interest"])
+            
+            //Beğenilmiş veya Beğenilmemiş kullanıcıların birdaha gösterilmemesi
+            var gosterme = [String]()
+        
+            if let likedUser = PFUser.current()?["liked"] as? [String]{
+                gosterme.append(contentsOf: likedUser)
+            }
+            if let unLikedUser = PFUser.current()?["unliked"] as? [String]{
+                gosterme.append(contentsOf: unLikedUser)
+            }
+            
+            sorgu.whereKey("objectId", notContainedIn: gosterme)
+            
+            sorgu.findObjectsInBackground { (kullanicilar, error) in
+                if let kisiler = kullanicilar{
+                    for kisi in kisiler{
+                        if let kullanici = kisi as? PFUser{
+                            if let imgFile = kullanici["profilePhoto"] as? PFFileObject{
+                                imgFile.getDataInBackground(block: { (data, error) in
+                                    if let imgData = data{
+                                        self.ortaResim.image = UIImage(data: imgData)
+                                    }
+                                    if let objectId = kisi.objectId{
+                                        self.userId = objectId
+                                    }
+                                })
+                            }
+                        }
+                    }
+                }
+            }
+            print("Query ÇALIŞTIIIIIIIIIIIIII")
+        }
+    }
 }
 
