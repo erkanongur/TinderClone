@@ -10,16 +10,12 @@ import UIKit
 import Parse
 class HomeViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
-    
-    var kullanici_ismi : String?
     var resimPicker = UIImagePickerController()
     
     
+    @IBOutlet weak var k_adi: UILabel!
     
     @IBOutlet weak var profilResim: UIImageView!
-    
-    @IBOutlet weak var k_hidden: UILabel!
-    @IBOutlet weak var kullanici_isim: UILabel!
     
     @IBOutlet weak var ilgiAlaniTextField: UITextField!
     @IBOutlet weak var cinsiyetTextField: UITextField!
@@ -39,7 +35,7 @@ class HomeViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDa
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        kullanici_isim.text = kullanici_ismi
+        k_adi.text = PFUser.current()?["username"] as! String
         profilResim.setRounded()
         
         //PickerView Ayarları

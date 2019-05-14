@@ -10,11 +10,13 @@ import UIKit
 import Parse
 class LogInViewController: UIViewController {
 
+    @IBOutlet weak var Header: UILabel!
     @IBOutlet weak var kullaniciAdi: UITextField!
     @IBOutlet weak var kullaniciSifre: UITextField!
     @IBOutlet weak var hataMesaji: UILabel!
     override func viewDidLoad() {
         super.viewDidLoad()
+        Header.font = UIFont(name:"Bebas Neue", size: 30.0)
         hataMesaji.isHidden = true
         // Do any additional setup after loading the view.
     }
@@ -42,8 +44,6 @@ class LogInViewController: UIViewController {
                 }
                 
                 let HomeVC = self.storyboard?.instantiateViewController(withIdentifier: "HomeVC") as! HomeViewController
-                HomeVC.kullanici_ismi = user?.username // HomeVC sayfasına kullanıcı adını taşıma işlemi
-                print("Anasayfaya Hoş Geldiniz !!!")
                 self.present(HomeVC, animated: true, completion: nil)
             }
         }

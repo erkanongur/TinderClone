@@ -11,16 +11,16 @@ import Parse
 
 class SignUpViewController: UIViewController {
 
+    @IBOutlet weak var Header: UILabel!
     @IBOutlet weak var kullaniciAdi: UITextField!
     @IBOutlet weak var kullaniciMail: UITextField!
     @IBOutlet weak var kullaniciSifre: UITextField!
     @IBOutlet weak var hataMesaji: UILabel!
-    @IBOutlet weak var logo: UIImageView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        Header.font = UIFont(name:"Bebas Neue", size: 30.0)
         hataMesaji.isHidden = true
-        logo.image = UIImage(named: "tinderlogo")
         // Do any additional setup after loading the view.
     }
     
@@ -49,3 +49,4 @@ class SignUpViewController: UIViewController {
     }
     
 }
+
